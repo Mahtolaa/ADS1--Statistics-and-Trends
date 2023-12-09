@@ -56,13 +56,13 @@ def indicator_set(indicators):
     ind = data[data['Indicator Name'].isin(indicators)]
     return ind
 
-
 climate_change_indicators = [
     'CO2 emissions (metric tons per capita)',
     'Renewable energy consumption (% of total final energy consumption)',
     'Forest area (% of land area)',
-    'Access to electricity (% of population), Agriculture, forestry, and \
-    fishing, value added (% of GDP)', 'Population, total',  
+    'Access to electricity (% of population)', 
+    'Agriculture, forestry, and fishing, value added (% of GDP)', 
+    'Population, total'  
 ]
 
 ind = indicator_set(climate_change_indicators)
@@ -87,7 +87,94 @@ def country_set(countries):
 
 
 # Selecting the countries specifically
-countries = ['United Kingdom', 'China', 'India', 'Kenya', 'Russian Federation',
-             'Bangladesh', 'Canada', 'Sweden', 'Nigeria', 'Maldives']
-
+countries = ['United States', 'China', 'India', 'Kenya', 'Russian Federation', 
+             'Canada', 'Sweden', 'Nigeria', 'Maldives']
 specific_count = country_set(countries)
+
+
+def grp_countries_ind(indicator):
+    """
+    Selects and groups countries based on the specific indicators,
+    to a python DataFrame
+
+    Arguments:
+    indicator: Choosing the indicator
+
+    Returns:
+    grp_ind_con: A pandas dataframe with specific countries selected
+    """
+    grp_ind_con = specific_count[specific_count["Indicator Name"] == indicator]
+    grp_ind_con = grp_ind_con.set_index('Country Name', drop=True)
+    grp_ind_con = grp_ind_con.transpose().drop('Indicator Name')
+    grp_ind_con[countries] = grp_ind_con[countries].apply(pd.to_numeric, errors='coerce', axis=1)
+    
+    return grp_ind_con
+
+# Giving each indicator a dataframe
+co2_em = grp_countries_ind("CO2 emissions (metric tons per capita)")
+ren_energy = grp_countries_ind("Renewable energy consumption (% of total final energy consumption)")
+for_area = grp_countries_ind("Forest area (% of land area)")
+access_to_ele = grp_countries_ind("Access to electricity (% of population)")
+pop = grp_countries_ind("Population, total")
+agric = grp_countries_ind("Agriculture, forestry, and fishing, value added (% of GDP)")
+
+
+def skew(dist):
+    """ Calculates the centralised and normalised skewness of dist. """
+
+    # calculates average and std, dev for centralising and normalising
+    aver = np.mean(dist)
+    std = np.std(dist)
+    value = np.sum(((dist-aver) / std)**3) / len(dist-1)
+
+    return value
+
+
+def kurtosis(dist):
+    """ Calculates the centralised and normalised excess kurtosis of dist. """
+
+    # calculates average and std, dev for centralising and normalising
+    aver = np.mean(dist)
+    std = np.std(dist)
+
+    # now calculate the kurtosis
+    value = np.sum(((dist-aver) / std)**4) / len(dist-1) - 3.0
+
+    return value
+
+
+# Now check for the skewness and kurtosis of each indicator selected
+print(skew(ren_energy))
+print(kurtosis(for_area))
+
+# Statistical properties of indicators
+
+# Total population
+print(pop.describe())
+# CO2 Emission from liquid fuel consumption
+print(co2_em.describe())
+# Renewable Energy Consumption
+print(ren_energy.describe())
+# Access to Electricity
+print(access_to_ele.describe())
+# Forest Area(% of land Area)
+print(for_area.describe())
+# Agriculture
+print(agric.describe())
+
+# Function
+
+
+def plot_total_population(pop):
+    plt.figure(figsize=(15, 10))
+    for country in pop.columns:
+        plt.plot(pop.index, pop[country], label=country)
+    plt.xlabel('Year')
+    plt.ylabel('Population, total')
+    plt.title('Total Population Over Time for Selected Countries')
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left')
+    plt.rcParams["figure.dpi"] = 300
+    plt.savefig('Line Plot.png')
+    plt.show()
+    
+plot_total_population(pop)
