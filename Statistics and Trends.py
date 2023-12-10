@@ -184,31 +184,96 @@ def plot_forest_area(for_area):
         plt.plot(for_area.index, for_area[country], label=country)
     plt.xlabel('Year')
     plt.ylabel('Forest area (% of land area)')
-    plt.title('Forest area')
+    plt.title('Forest area Over years for Selected Countries')
     plt.legend(bbox_to_anchor=(1, 1), loc='upper left')
     plt.rcParams["figure.dpi"] = 300
     plt.grid(False)
     plt.show()
     
 
-def plot_co2_emissions_bar(Year):
+def plot_co2_emissions_bar():
     """
     Plots a bar plot for co2 emissions in the selected countries.
     """
-    Year = co2_em.loc[Year]
+
 
     # Plotting
     plt.figure(figsize=(10, 8))
-    co2_em.plot(kind='bar')
+    co2_em.T.iloc[:, 1::4].plot(kind='bar')
     plt.title("CO2 emissions (metric tons per capita)")
-    plt.xlabel("CO2 emissions (metric tons per capita))")
-    plt.ylabel("Country")
+    plt.xlabel("Country")
+    plt.ylabel("CO2 Emissions")
     plt.legend(bbox_to_anchor=(1, 1), loc='upper left')
     plt.rcParams["figure.dpi"] = 300
+    plt.grid(False)
     plt.show()
-
     
+
+
+def plot_heatmap_correlation(data, country,
+                             indicators, years, fig_size=(8, 5)):
+    """
+    Plots a correlation heatmap for selected indicators of a specific country.
+
+    :param data: DataFrame containing the data.
+    :param country: String, name of the country to filter the data.
+    :param indicators: List of strings, names of the indicators to be included.
+    :param years: List of strings, years to be considered for analysis.
+    :param dpi: Integer, the resolution of the figure in dots-per-inch.
+    :param fig_size: Tuple of integers, the size of the figure (width, height).
+    """
+    # Filter data for the specified country and indicators
+    filtered_df = data[data['Country Name'] == country]
+    filtered_df = filtered_df[filtered_df['Indicator Name'].isin(indicators)]
+    filtered_df = filtered_df.set_index('Indicator Name')
+
+    # Drop unnecessary columns
+    filtered_df = filtered_df.drop(columns=['Country Name']
+                                   + [str(year) for year in range(1990, 2020)
+                                      if str(year) not in years])
+
+    # Transpose the DataFrame for correlation calculation
+    transposed_df = filtered_df.transpose()
+
+    # Calculate correlation
+    correlation = transposed_df.corr().round(2)
+
+    # Plotting the heatmap
+    plt.imshow(correlation, cmap='Accent_r', interpolation='none')
+    plt.colorbar()
+    plt.xticks(range(len(correlation)), correlation.columns, rotation=90)
+    plt.yticks(range(len(correlation)), correlation.columns)
+    plt.gcf().set_size_inches(*fig_size)
+    plt.rcParams["figure.dpi"] = 300
+
+    # Adding labels to the heatmap
+    for y in range(correlation.shape[0]):
+        for x in range(correlation.shape[1]):
+            plt.text(x, y, '{:.2f}'.format(correlation.values[y, x]),
+                     ha='center', va='center', color='black')
+
+    plt.title(f'Correlation Map of Indicators for {country}')
+    plt.savefig('Heatmap_Correlation.png')
+    plt.show()
+ 
+    
+indicators = [
+    'CO2 emissions (metric tons per capita)',
+    'Population, total',
+    'Electricity production from oil sources (% of total)',
+    'Agriculture, forestry, and fishing, value added (% of GDP)',
+    'Renewable energy consumption (% of total final energy consumption)',
+    'Forest area (% of land area)'
+
+]
+years = ['2000', '2001', '2002', '2003', '2004',
+         '2005', '2006', '2007', '2008', '2009',
+         '2010', '2011', '2012', '2013', '2014',
+         '2015', '2016', '2017', '2019', '2020']
+
+
 plot_total_population(pop)
 plot_forest_area(for_area)
-plot_co2_emissions_bar(co2_em.loc[:, ['2000', '2005', '2010', '2015', '2020']])
-
+plot_co2_emissions_bar()
+plot_heatmap_correlation(data, 'India', indicators, years)
+plot_heatmap_correlation(data, 'Sweden', indicators, years)
