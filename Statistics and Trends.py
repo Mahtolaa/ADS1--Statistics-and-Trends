@@ -87,7 +87,7 @@ def country_set(countries):
 
 
 # Selecting the countries specifically
-countries = ['United States', 'China', 'India', 'Kenya', 'Russian Federation', 
+countries = ['United Kingdom', 'China', 'India', 'Kenya', 'Russian Federation', 
              'Canada', 'Sweden', 'Nigeria', 'Maldives']
 specific_count = country_set(countries)
 
@@ -171,10 +171,44 @@ def plot_total_population(pop):
         plt.plot(pop.index, pop[country], label=country)
     plt.xlabel('Year')
     plt.ylabel('Population, total')
-    plt.title('Total Population Over Time for Selected Countries')
+    plt.title('Total Population growth Over years for Selected Countries')
     plt.legend(bbox_to_anchor=(1, 1), loc='upper left')
     plt.rcParams["figure.dpi"] = 300
-    plt.savefig('Line Plot.png')
+    plt.grid(False)
+    plt.show()
+ 
+    
+def plot_forest_area(for_area):
+    plt.figure(figsize=(15, 10))
+    for country in co2_em.columns:
+        plt.plot(for_area.index, for_area[country], label=country)
+    plt.xlabel('Year')
+    plt.ylabel('Forest area (% of land area)')
+    plt.title('Forest area')
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left')
+    plt.rcParams["figure.dpi"] = 300
+    plt.grid(False)
     plt.show()
     
+
+def plot_co2_emissions_bar(Year):
+    """
+    Plots a bar plot for co2 emissions in the selected countries.
+    """
+    Year = co2_em.loc[Year]
+
+    # Plotting
+    plt.figure(figsize=(10, 8))
+    co2_em.plot(kind='bar')
+    plt.title("CO2 emissions (metric tons per capita)")
+    plt.xlabel("CO2 emissions (metric tons per capita))")
+    plt.ylabel("Country")
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left')
+    plt.rcParams["figure.dpi"] = 300
+    plt.show()
+
+    
 plot_total_population(pop)
+plot_forest_area(for_area)
+plot_co2_emissions_bar(co2_em.loc[:, ['2000', '2005', '2010', '2015', '2020']])
+
