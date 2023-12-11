@@ -208,6 +208,23 @@ def plot_co2_emissions_bar():
     plt.grid(False)
     plt.show()
     
+    
+def plot_Agriculture_bar():
+    """
+    Plots a bar plot for co2 emissions in the selected countries.
+    """
+
+
+    # Plotting
+    plt.figure(figsize=(10, 8))
+    agric.T.iloc[:, 1::4].plot(kind='bar')
+    plt.title("Agriculture, forestry, and fishing, value added (% of GDP")
+    plt.xlabel("Country")
+    plt.ylabel("% of GDP")
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left')
+    plt.rcParams["figure.dpi"] = 300
+    plt.grid(False)
+    plt.show()
 
 
 def plot_heatmap_correlation(data, country,
@@ -271,9 +288,10 @@ years = ['2000', '2001', '2002', '2003', '2004',
          '2010', '2011', '2012', '2013', '2014',
          '2015', '2016', '2017', '2019', '2020']
 
-
+# Plot-Function Executions
 plot_total_population(pop)
 plot_forest_area(for_area)
 plot_co2_emissions_bar()
+plot_Agriculture_bar()
 plot_heatmap_correlation(data, 'India', indicators, years)
 plot_heatmap_correlation(data, 'Sweden', indicators, years)
