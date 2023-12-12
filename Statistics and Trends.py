@@ -114,11 +114,13 @@ def grp_countries_ind(indicator):
 
 # Giving each indicator a dataframe
 co2_em = grp_countries_ind("CO2 emissions (metric tons per capita)")
-ren_energy = grp_countries_ind("Renewable energy consumption (% of total final energy consumption)")
+ren_energy = grp_countries_ind(
+    "Renewable energy consumption (% of total final energy consumption)")
 for_area = grp_countries_ind("Forest area (% of land area)")
 access_to_ele = grp_countries_ind("Access to electricity (% of population)")
 pop = grp_countries_ind("Population, total")
-agric = grp_countries_ind("Agriculture, forestry, and fishing, value added (% of GDP)")
+agric = grp_countries_ind(
+    "Agriculture, forestry, and fishing, value added (% of GDP)")
 
 # Statistical properties of indicators
 # Use Skewness to explore the statistical properties of the indicators
@@ -152,10 +154,12 @@ def kurtosis(dist):
 
 
 # Now check for the skewness and kurtosis of each indicator selected
-print(skew(ren_energy))
-print(kurtosis(for_area))
+print(skew(pop))
+print(kurtosis(pop))
+print(skew(co2_em))
+print(kurtosis(co2_em))
 
-# Use .describe method to explore the statistical properties of the indicators
+# Use describe method to explore the statistical properties of the indicators
 
 # Total population
 print(pop.describe())
@@ -312,7 +316,6 @@ def plot_heatmap_correlation(data, country,
     plt.savefig('Heatmap_Correlation.png')
     plt.show()
  
-    
 indicators = [
     'CO2 emissions (metric tons per capita)',
     'Population, total',
