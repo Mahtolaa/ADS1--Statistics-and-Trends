@@ -106,7 +106,9 @@ def grp_countries_ind(indicator):
     grp_ind_con = specific_count[specific_count["Indicator Name"] == indicator]
     grp_ind_con = grp_ind_con.set_index('Country Name', drop=True)
     grp_ind_con = grp_ind_con.transpose().drop('Indicator Name')
-    grp_ind_con[countries] = grp_ind_con[countries].apply(pd.to_numeric, errors='coerce', axis=1)
+    grp_ind_con[countries] = grp_ind_con[countries].apply(pd.to_numeric, 
+                                                          errors='coerce', 
+                                                          axis=1)
     
     return grp_ind_con
 
@@ -118,6 +120,9 @@ access_to_ele = grp_countries_ind("Access to electricity (% of population)")
 pop = grp_countries_ind("Population, total")
 agric = grp_countries_ind("Agriculture, forestry, and fishing, value added (% of GDP)")
 
+# Statistical properties of indicators
+# Use Skewness to explore the statistical properties of the indicators
+
 
 def skew(dist):
     """ Calculates the centralised and normalised skewness of dist. """
@@ -128,6 +133,9 @@ def skew(dist):
     value = np.sum(((dist-aver) / std)**3) / len(dist-1)
 
     return value
+
+
+# Use Kurtosis to explore the statistical properties of the indicators
 
 
 def kurtosis(dist):
@@ -147,7 +155,7 @@ def kurtosis(dist):
 print(skew(ren_energy))
 print(kurtosis(for_area))
 
-# Statistical properties of indicators
+# Use .describe method to explore the statistical properties of the indicators
 
 # Total population
 print(pop.describe())
@@ -162,33 +170,62 @@ print(for_area.describe())
 # Agriculture
 print(agric.describe())
 
-# Function
+# Create Functions for each plot
 
 
 def plot_total_population(pop):
-    plt.figure(figsize=(15, 10))
+    """
+    Plot a time-series line plot of the population growth of selected countries
+    """
+    plt.figure(figsize=(15, 8))
     for country in pop.columns:
         plt.plot(pop.index, pop[country], label=country)
-    plt.xlabel('Year')
-    plt.ylabel('Population, total')
-    plt.title('Total Population growth Over years for Selected Countries')
-    plt.legend(bbox_to_anchor=(1, 1), loc='upper left')
+    plt.xlabel('Year', fontsize=18)
+    plt.ylabel('Population, total', fontsize=18)
+    plt.title('Total Population growth Over years for Selected Countries', 
+              fontsize=20)
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', fontsize=16)
     plt.rcParams["figure.dpi"] = 300
     plt.grid(False)
     plt.show()
+    return
  
+
+def plot_renewable_energy(ren_energy):
+    """
+    Plot a time-series line plot of the renewable energy consumption
+    of selected countries
+    """
+    plt.figure(figsize=(15, 8))
+    for country in ren_energy.columns:
+        plt.plot(ren_energy.index, ren_energy[country], label=country)
+    plt.xlabel('Year', fontsize=18)
+    plt.ylabel('Renewable Energy Consumed-% of total final energy consumption', 
+               fontsize=18)
+    plt.title('Renewable Energy Consumption Over years for Selected Countries',
+              fontsize=20)
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', fontsize=16)
+    plt.rcParams["figure.dpi"] = 300
+    plt.grid(False)
+    plt.show()
+    return
+
     
 def plot_forest_area(for_area):
-    plt.figure(figsize=(15, 10))
+    """
+    Plot a time-series line plot of the forest area of the selected countries
+    """
+    plt.figure(figsize=(15, 8))
     for country in co2_em.columns:
         plt.plot(for_area.index, for_area[country], label=country)
-    plt.xlabel('Year')
-    plt.ylabel('Forest area (% of land area)')
-    plt.title('Forest area Over years for Selected Countries')
-    plt.legend(bbox_to_anchor=(1, 1), loc='upper left')
+    plt.xlabel('Year', fontsize=18)
+    plt.ylabel('Forest area (% of land area)', fontsize=18)
+    plt.title('Forest area Over years for Selected Countries', fontsize=20)
+    plt.legend(bbox_to_anchor=(1, 1), loc='upper left', fontsize=16)
     plt.rcParams["figure.dpi"] = 300
     plt.grid(False)
     plt.show()
+    return
     
 
 def plot_co2_emissions_bar():
@@ -196,36 +233,37 @@ def plot_co2_emissions_bar():
     Plots a bar plot for co2 emissions in the selected countries.
     """
 
-
     # Plotting
     plt.figure(figsize=(10, 8))
     co2_em.T.iloc[:, 1::4].plot(kind='bar')
-    plt.title("CO2 emissions (metric tons per capita)")
+    plt.title("CO2 emissions")
     plt.xlabel("Country")
-    plt.ylabel("CO2 Emissions")
+    plt.xticks(rotation=45)
+    plt.ylabel("CO2 Emissions (metric tons per capita)")
     plt.legend(bbox_to_anchor=(1, 1), loc='upper left')
     plt.rcParams["figure.dpi"] = 300
     plt.grid(False)
     plt.show()
-    
+    return
     
 def plot_Agriculture_bar():
     """
-    Plots a bar plot for co2 emissions in the selected countries.
+    Plots a bar plot for Agriculture, forestry and fishing (% of GDP) 
+    for the selected countries.
     """
-
 
     # Plotting
     plt.figure(figsize=(10, 8))
     agric.T.iloc[:, 1::4].plot(kind='bar')
-    plt.title("Agriculture, forestry, and fishing, value added (% of GDP")
+    plt.title("Agriculture, forestry, and fishing")
     plt.xlabel("Country")
-    plt.ylabel("% of GDP")
+    plt.xticks(rotation=45)
+    plt.ylabel("Agriculture, forestry, and fishing, value added (% of GDP)")
     plt.legend(bbox_to_anchor=(1, 1), loc='upper left')
     plt.rcParams["figure.dpi"] = 300
     plt.grid(False)
     plt.show()
-
+    return
 
 def plot_heatmap_correlation(data, country,
                              indicators, years, fig_size=(8, 5)):
@@ -259,6 +297,7 @@ def plot_heatmap_correlation(data, country,
     plt.imshow(correlation, cmap='Accent_r', interpolation='none')
     plt.colorbar()
     plt.xticks(range(len(correlation)), correlation.columns, rotation=90)
+    
     plt.yticks(range(len(correlation)), correlation.columns)
     plt.gcf().set_size_inches(*fig_size)
     plt.rcParams["figure.dpi"] = 300
@@ -269,7 +308,7 @@ def plot_heatmap_correlation(data, country,
             plt.text(x, y, '{:.2f}'.format(correlation.values[y, x]),
                      ha='center', va='center', color='black')
 
-    plt.title(f'Correlation Map of Indicators for {country}')
+    plt.title(f'Correlation Map of Indicators for {country}', fontsize=20)
     plt.savefig('Heatmap_Correlation.png')
     plt.show()
  
@@ -277,7 +316,7 @@ def plot_heatmap_correlation(data, country,
 indicators = [
     'CO2 emissions (metric tons per capita)',
     'Population, total',
-    'Electricity production from oil sources (% of total)',
+    'Access to electricity (% of population)',
     'Agriculture, forestry, and fishing, value added (% of GDP)',
     'Renewable energy consumption (% of total final energy consumption)',
     'Forest area (% of land area)'
@@ -290,8 +329,9 @@ years = ['2000', '2001', '2002', '2003', '2004',
 
 # Plot-Function Executions
 plot_total_population(pop)
+plot_renewable_energy(ren_energy)
 plot_forest_area(for_area)
 plot_co2_emissions_bar()
 plot_Agriculture_bar()
 plot_heatmap_correlation(data, 'India', indicators, years)
-plot_heatmap_correlation(data, 'Sweden', indicators, years)
+plot_heatmap_correlation(data, 'Nigeria', indicators, years)
